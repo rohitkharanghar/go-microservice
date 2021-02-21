@@ -1,22 +1,22 @@
 package main
 
 import (
-	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
+
+	"github.com/rohitkharanghar/go-microservice/handlers"
 )
 
 func main() {
-	http.HandleFunc("/", func(rw http.ResponseWriter, r *http.Request) {
-		log.Printf("Hello World!!")
-		data, _ := ioutil.ReadAll(r.Body)
-		log.Printf("Data %s", data)
 
-	})
+	logger := log.New(os.Stdout, "Go-Microservice", log.LstdFlags)
 
-	http.HandleFunc("/goodBye", func(rw http.ResponseWriter, r *http.Request) {
-		log.Printf("GoodBye World!!")
-	})
+	hh := handlers.NewHello(logger)
+	gh := handlers.NewGoodBye(logger)
 
-	http.ListenAndServe(":9090", nil)
+	serverMutex := http.NewServeMux()
+	serverMutex.Handle("/", hh)
+	serverMutex.Handle("/goodBye", gh)
+	http.ListenAndServe(":9090", serverMutex)
 }
